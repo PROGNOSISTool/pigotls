@@ -212,6 +212,7 @@ type Context struct {
 	savedTicket         *C.ptls_iovec_t
 	maxEarlyData 		*C.size_t
 	alpnVec 			C.ptls_iovec_t
+	resumptionTicketVec C.ptls_iovec_t
 
 	zeroRTTSecret *C.ptls_iovec_t
 	hsReadSecret  *C.ptls_iovec_t
@@ -249,8 +250,8 @@ func NewContext(ALPN string, resumptionTicket []byte) Context {
 	C.init_ctx(&ctx)
 
 	c.alpnVec = toIOVec([]byte(ALPN))
-	resumptionTicketVec := toIOVec(resumptionTicket)
-	C.set_handshake_properties(c.handshakeProperties, &c.alpnVec, &resumptionTicketVec, c.maxEarlyData)
+	c.resumptionTicketVec = toIOVec(resumptionTicket)
+	C.set_handshake_properties(c.handshakeProperties, &c.alpnVec, &c.resumptionTicketVec, c.maxEarlyData)
 	C.set_ticket_cb(c.ctx, c.savedTicket)
 	C.set_traffic_secret_cb(c.ctx, c.zeroRTTSecret, c.hsReadSecret, c.hsWriteSecret, c.apReadSecret, c.apWriteSecret)
 
@@ -321,6 +322,7 @@ func (c *Connection) HandleMessage(data []byte, epoch Epoch) ([]Message, bool, e
 	}
 
 	var epoch_offsets [5]C.size_t
+	C.set_handshake_properties(c.Context.handshakeProperties, &c.Context.alpnVec, &c.Context.resumptionTicketVec, c.Context.maxEarlyData)
 	ret := C.ptls_handle_message(c.tls, &sendbuf, (*C.size_t)(unsafe.Pointer(&epoch_offsets)), C.size_t(epoch), recbuf, inputLen, c.Context.handshakeProperties)
 
 	retBuf := bufToSlice(sendbuf)
