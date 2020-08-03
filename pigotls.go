@@ -322,9 +322,7 @@ func (c *Connection) HandleMessage(data []byte, epoch Epoch) ([]Message, bool, e
 	}
 
 	var epoch_offsets [5]C.size_t
-    if epoch == EpochInitial {
-	    C.set_handshake_properties(c.Context.handshakeProperties, &c.Context.alpnVec, &c.Context.resumptionTicketVec, c.Context.maxEarlyData)
-    }
+	C.set_handshake_properties(c.Context.handshakeProperties, &c.Context.alpnVec, &c.Context.resumptionTicketVec, c.Context.maxEarlyData)
 	ret := C.ptls_handle_message(c.tls, &sendbuf, (*C.size_t)(unsafe.Pointer(&epoch_offsets)), C.size_t(epoch), recbuf, inputLen, c.Context.handshakeProperties)
 
 	retBuf := bufToSlice(sendbuf)
