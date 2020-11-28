@@ -7,6 +7,6 @@ all:
 	patch -p 1 -N < ../tls13_only.patch; \
 	cmake ${CMAKE_OPTS} .; \
 	make; \
-	make check;
+	cd ..; \
 	CGO_LDFLAGS_ALLOW=\(.*picotls.*\)\|\(.*libssl.*\)\|\(.*libcrypto.*\) go build -n .
 	CGO_LDFLAGS_ALLOW=\(.*picotls.*\)\|\(.*libssl.*\)\|\(.*libcrypto.*\) go build .

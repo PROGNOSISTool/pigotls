@@ -473,6 +473,11 @@ func (c *AEAD) Encrypt(cleartext []byte, seq uint64, aad []byte) []byte {
 	return ciphertext[:ret]
 }
 func (c *AEAD) Decrypt(ciphertext []byte, seq uint64, aad []byte) []byte {
+    fmt.Printf("DEC CIPHERTEXT SIZE: %v", len(ciphertext))
+    fmt.Printf("DEC OVERHEAD SIZE: %v", c.Overhead())
+    if len(ciphertext) - c.Overhead() < 1 {
+        return nil
+    }
 	cleartext := make([]byte, len(ciphertext) - c.Overhead())
 	ret := C.ptls_aead_decrypt((*C.ptls_aead_context_t)(unsafe.Pointer(c)), unsafe.Pointer(&cleartext[0]), unsafe.Pointer(&ciphertext[0]), C.size_t(len(ciphertext)), C.uint64_t(seq), unsafe.Pointer(&aad[0]), C.size_t(len(aad)))
 	if ret == C.SIZE_MAX {
