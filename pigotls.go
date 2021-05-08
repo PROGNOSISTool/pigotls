@@ -473,8 +473,6 @@ func (c *AEAD) Encrypt(cleartext []byte, seq uint64, aad []byte) []byte {
 	return ciphertext[:ret]
 }
 func (c *AEAD) Decrypt(ciphertext []byte, seq uint64, aad []byte) []byte {
-    fmt.Printf("DEC CIPHERTEXT SIZE: %v", len(ciphertext))
-    fmt.Printf("DEC OVERHEAD SIZE: %v", c.Overhead())
     if len(ciphertext) - c.Overhead() < 1 {
         return nil
     }
